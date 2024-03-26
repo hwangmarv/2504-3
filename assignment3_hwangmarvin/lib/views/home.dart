@@ -89,16 +89,25 @@ class HomeViewState extends State<HomeView> {
                   if (_stockSymbol.isNotEmpty) {
                     print('User entered Symbol: $_stockSymbol');
                     try {
-                      final companyInfo = await _stockService.getCompanyInfo(_stockSymbol);
-                      final stockQuote = await _stockService.getQuote(_stockSymbol);
+                      final companyInfo =
+                          await _stockService.getCompanyInfo(_stockSymbol);
+                      final stockQuote =
+                          await _stockService.getQuote(_stockSymbol);
                       if (companyInfo != null && stockQuote != null) {
+                        final symbol = companyInfo['symbol'] as String? ??
+                            'N/A'; 
+                        final name = companyInfo['companyName'] as String? ??
+                            'N/A'; 
+                        final price = stockQuote['latestPrice']?.toString() ??
+                            'N/A'; 
                         final stock = Stock(
-                          symbol: companyInfo['symbol'],
-                          name: companyInfo['companyName'],
-                          price: stockQuote['latestPrice'].toString(),
+                          symbol: symbol,
+                          name: name,
+                          price: price,
                         );
                         await _databaseService.insertStock(stock);
-                        _stockList = await _databaseService.getAllStocksFromDb();
+                        _stockList =
+                            await _databaseService.getAllStocksFromDb();
                         setState(() {});
                       } else {
                         print('Failed to get stock info or quote.');
@@ -107,6 +116,7 @@ class HomeViewState extends State<HomeView> {
                       print('Error in inputStock: $e');
                     }
                   }
+
                   _stockSymbol = "";
                   Navigator.pop(context);
                 },
